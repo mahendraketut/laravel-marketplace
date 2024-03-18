@@ -17,19 +17,8 @@ class BrandController extends Controller
     {
         $brands = Brand::all();
 
-        $data = [
-            'brands' => $brands
-        ];
-
-        $meta = [
-            'TotalBrands' => $brands->count(),
-            'ActionAt' => now(),
-            'Message' => 'Data berhasil diambil'
-        ];
-
-        return $this->formatJsonResponse('Data berhasil diambil', $data, $meta, 200);
+        return $this->showResponse($brands->toArray());
     }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -37,16 +26,10 @@ class BrandController extends Controller
     {
         if ($request->validated()) {
             $brand = Brand::create($request->all());
-            $data = [
-                'brand' => $brand
-            ];
-            $meta = [
-                'ActionAt' => now(),
-                'Message' => 'Brand berhasil ditambahkan'
-            ];
-            return $this->formatJsonResponse('Brand berhasil ditambahkan', $data, $meta, 201);
+
+            return $this->createdResponse($brand->toArray());
         } else {
-            return $this->formatJsonResponse('Data gagal ditambahkan', $request, $request->errors(), 400);
+            return $this->validationErrorResponse($request->errors());
         }
     }
 
@@ -56,14 +39,8 @@ class BrandController extends Controller
     public function show(Brand $brand, $id)
     {
         $brand = Brand::findOrFail($id);
-        $data = [
-            'brand' => $brand
-        ];
-        $meta = [
-            'ActionAt' => now(),
-            'Message' => 'Data berhasil diambil'
-        ];
-        return $this->formatJsonResponse('Data berhasil diambil', $data, $meta, 200);
+
+        return $this->showResponse($brand->toArray());
     }
 
     /**
@@ -74,16 +51,10 @@ class BrandController extends Controller
         if ($request->validated()) {
             $brand = Brand::findOrFail($id);
             $brand->update($request->all());
-            $data = [
-                'brand' => $brand
-            ];
-            $meta = [
-                'ActionAt' => now(),
-                'Message' => 'Brand berhasil diupdate'
-            ];
-            return $this->formatJsonResponse('Brand berhasil diupdate', $data, $meta, 200);
+
+            return $this->updatedResponse($brand->toArray());
         } else {
-            return $this->formatJsonResponse('Data gagal diupdate', $request, $request->errors(), 400);
+            return $this->validationErrorResponse($request->errors());
         }
     }
 
@@ -94,14 +65,8 @@ class BrandController extends Controller
     {
         $brand = Brand::findOrFail($id);
         $brand->delete();
-        $data = [
-            'brand' => $brand
-        ];
-        $meta = [
-            'ActionAt' => now(),
-            'Message' => 'Brand berhasil dihapus'
-        ];
-        return $this->formatJsonResponse('Brand berhasil dihapus', $data, $meta, 200);
+
+        return $this->deletedResponse($brand->toArray());
     }
 
     /**
@@ -110,14 +75,8 @@ class BrandController extends Controller
     public function trash()
     {
         $brands = Brand::onlyTrashed()->get();
-        $data = [
-            'brands' => $brands
-        ];
-        $meta = [
-            'ActionAt' => now(),
-            'Message' => 'Data berhasil diambil'
-        ];
-        return $this->formatJsonResponse('Data berhasil diambil', $data, $meta, 200);
+
+        return $this->showResponse($brands->toArray());
     }
 
     /**
@@ -127,13 +86,7 @@ class BrandController extends Controller
     {
         $brand = Brand::withTrashed()->findOrFail($id);
         $brand->restore();
-        $data = [
-            'brand' => $brand
-        ];
-        $meta = [
-            'ActionAt' => now(),
-            'Message' => 'Brand berhasil direstore'
-        ];
-        return $this->formatJsonResponse('Brand berhasil direstore', $data, $meta, 200);
+
+        return $this->restoredResponse($brand->toArray());
     }
 }

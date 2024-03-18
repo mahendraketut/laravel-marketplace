@@ -49,19 +49,7 @@ class ProductController extends Controller
         // pagination mechanism
         $products = $products->paginate(10);   // get 10 products per page
 
-        $data = [
-            'products' => $products
-        ];
-
-        $meta = [
-            'ActionAt' => now(),
-            'Message' => "Data berhasil diambii",
-            'ProductsCount' => count($products),
-            'CurrentPage' => $products->currentPage(),
-            'LastPage' => $products->lastPage(),
-        ];
-
-        return $this->formatJsonResponse('Data berhasil diambil', $data, $meta, 200);
+        return $this->showResponse($products);
     }
 
     /**
@@ -72,9 +60,9 @@ class ProductController extends Controller
 
         if ($request->validated()) {
             $product = Product::create($request->all());
-            return response()->json(['message' => 'Product berhasil ditambahkan', 'product' => $product], 201);
+            return $this->createdResponse($product->toArray());
         } else {
-            return response()->json(['message' => $request->errors()], 400);
+            return $this->validationErrorResponse($request->errors());
         }
     }
 
@@ -85,7 +73,7 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $product->category_id = $product->category->name;
-        return response()->json(['product' => $product]);
+        return $this->showResponse($product->toArray());
     }
 
     /**
@@ -97,9 +85,9 @@ class ProductController extends Controller
             $product = Product::findOrFail($id);
 
             $product->update($request->all());
-            return response()->json(['message' => 'Product berhasil diupdate', 'product' => $product]);
+            return $this->updatedResponse($product->toArray());
         } else {
-            return response()->json(['message' => $request->errors()], 400);
+            return $this->validationErrorResponse($request->errors());
         }
     }
 
@@ -110,11 +98,10 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
         if (!$product) {
-            return response()->json(['message' => 'Product tidak ditemukan'], 404);
+            return $this->notFoundResponse();
         }
-
         $product->delete();
-        return response()->json(['message' => 'Product berhasil dihapus']);
+        return $this->deletedResponse($product->toArray());
     }
 
     /**
@@ -125,10 +112,10 @@ class ProductController extends Controller
         $softDeletedProducts = Product::onlyTrashed()->get();
 
         if ($softDeletedProducts->isEmpty()) {
-            return response()->json(['message' => 'Tidak ditemukan produk yang dihapus']);
+            return $this->notFoundResponse();
         }
 
-        return response()->json(['products' => $softDeletedProducts]);
+        return $this->showResponse($softDeletedProducts);
     }
 
     /**
@@ -141,10 +128,10 @@ class ProductController extends Controller
 
         try {
             if ($product->restore()) {
-                return response()->json(['message' => 'Product berhasil direstore', 'product' => $product]);
+                return $this->restoredResponse($product->toArray());
             }
         } catch (\Throwable $th) {
-            return response()->json(['message' => 'Product tidak ditemukan'], 404);
+            return $this->errorResponse($th->getMessage());
         }
     }
 }

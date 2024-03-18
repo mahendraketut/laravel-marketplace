@@ -6,11 +6,13 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
+use App\Traits\JsonResponseTrait;
 use Illuminate\Http\Request;
 
 
 class CategoryController extends Controller
 {
+    use JsonResponseTrait;
     /**
      * Display a listing of the resource.
      */
@@ -20,7 +22,7 @@ class CategoryController extends Controller
             $query->where('nama', 'like', '%i%');
         }])->get();
 
-        return response()->json(['categories' => $categories]);
+        return $this->showResponse($categories);
     }
 
     /**
@@ -30,20 +32,20 @@ class CategoryController extends Controller
     {
         if ($request->validated()) {
             $category = Category::create($request->all());
-            return response()->json(['message' => 'Category berhasil ditambahkan', 'category' => $category], 201);
+            return $this->createdResponse($category->toArray());
         } else {
-            return response()->json(['message' => $request->errors()], 400);
+            return $this->validationErrorResponse($request->errors());
         }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Category $category, $id)
-    {
-        $category = Category::findOrFail($id);
-        return response()->json(['category' => $category]);
-    }
+    // public function show(Category $category, $id)
+    // {
+    //     $category = Category::findOrFail($id);
+    //     return response()->json(['category' => $category]);
+    // }
 
     /**
      * Update the specified resource in storage.
@@ -53,9 +55,9 @@ class CategoryController extends Controller
         if ($request->validated()) {
             $category = Category::findOrFail($id);
             $category->update($request->all());
-            return response()->json(['message' => 'Category berhasil diupdate', 'category' => $category], 201);
+            return $this->updatedResponse($category->toArray());
         } else {
-            return response()->json(['message' => $request->errors()], 400);
+            return $this->validationErrorResponse($request->errors());
         }
     }
 
@@ -66,7 +68,7 @@ class CategoryController extends Controller
     {
         $category = Category::findOrFail($id);
         $category->delete();
-        return response()->json(['message' => 'Category berhasil dihapus']);
+        return $this->deletedResponse($category->toArray());
     }
 
     /**
@@ -75,7 +77,7 @@ class CategoryController extends Controller
     public function trash()
     {
         $categories = Category::onlyTrashed()->get();
-        return response()->json(['categories' => $categories]);
+        return $this->showResponse($categories);
     }
 
     /**
@@ -85,6 +87,6 @@ class CategoryController extends Controller
     {
         $category = Category::withTrashed()->findOrFail($id);
         $category->restore();
-        return response()->json(['message' => 'Category berhasil direstore']);
+        return $this->restoredResponse($category->toArray());
     }
 }
