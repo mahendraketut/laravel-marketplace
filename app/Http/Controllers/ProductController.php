@@ -16,7 +16,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $products = Product::with('category');
+        $products = Product::with('category', 'brand');
 
         // search mechanism
         if ($request->has('search') && $request->search !== '') {
