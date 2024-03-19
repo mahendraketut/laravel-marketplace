@@ -15,13 +15,7 @@ class LogoutController extends Controller
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
-        $data = [
-            'user' => $request->user()
-        ];
-        $meta = [
-            'ActionAt' => now(),
-            'Message' => "Logout berhasil"
-        ];
-        return $this->formatJsonResponse('Logout berhasil', $data, $meta, 200);
+
+        return $this->logoutResponse();
     }
 }

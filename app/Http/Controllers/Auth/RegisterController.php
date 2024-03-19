@@ -26,16 +26,6 @@ class RegisterController extends Controller
 
         $token = $user->createToken('api_token')->plainTextToken;
 
-        $data = [
-            'user' => $user,
-            'token' => $token
-        ];
-
-        $meta = [
-            'ActionAt' => now(),
-            'Message' => 'Register berhasil'
-        ];
-
-        return $this->formatJsonResponse('Register berhasil', $data, $meta, 201);
+        return $this->authenticatedResponse(['token' => $token, 'user' => $user]);
     }
 }

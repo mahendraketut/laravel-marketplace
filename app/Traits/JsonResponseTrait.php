@@ -64,7 +64,7 @@ trait JsonResponseTrait
      */
     protected function notFoundResponse()
     {
-        return $this->errorEnvelope(404, 'Data tidak ditemukan', null, ['ActionAt' => now()]);
+        return $this->errorEnvelope(404, 'Uang tidak ditemukan', null, ['ActionAt' => now()]);
     }
 
     /**
@@ -74,6 +74,30 @@ trait JsonResponseTrait
     protected function unauthorizedResponse($error)
     {
         return $this->errorEnvelope(401, 'Unauthorized', $error, ['ActionAt' => now()]);
+    }
+
+    /**
+     * standard response for user already authenticated.
+     */
+    protected function alreadyAuthenticatedResponse()
+    {
+        return $this->errorEnvelope(400, 'User already authenticated', null, ['ActionAt' => now()]);
+    }
+
+    /**
+     *  standard response for user sucess authenticated.
+     */
+    protected function authenticatedResponse($data)
+    {
+        return $this->successEnvelope(200, 'User authenticated', $data, ['ActionAt' => now()]);
+    }
+
+    /**
+     * standard response for user logout.
+     */
+    public function logoutResponse()
+    {
+        return $this->successEnvelope(200, 'User logout', null, ['ActionAt' => now()]);
     }
 
     /**
